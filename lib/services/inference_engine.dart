@@ -98,7 +98,7 @@ class InferenceEngine {
 
     // 9. Ambil detail diagnosis
     final diagnosisData = await db.query(
-      'diagnosis',
+      'diagnosissssss',
       where: 'id = ?',
       whereArgs: [finalDiagnosisId],
     );
