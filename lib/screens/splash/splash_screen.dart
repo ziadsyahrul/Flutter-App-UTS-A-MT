@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _controller.forward();
 
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 2), () {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       if (authProvider.isLoggedIn) {
