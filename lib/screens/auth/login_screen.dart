@@ -1,12 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_for_ues/providers/auth_provider.dart';
-import 'package:flutter_app_for_ues/screens/home/home_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_app_for_ues/providers/auth_provider.dart';
+import 'package:flutter_app_for_ues/screens/auth/register_screen.dart';
+import 'package:flutter_app_for_ues/screens/home/home_screen.dart';
 
+// Controllers tetap di luar class untuk akses mudah, meskipun lebih baik di dalam State
 final TextEditingController _emailController = TextEditingController();
 final TextEditingController _passwordController = TextEditingController();
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({
+    super.key,
+  }); // Tambahkan key dan ubah menjadi StatefulWidget
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  // 🔑 Variabel State untuk mengontrol status tampil/sembunyi kata sandi
+  bool _isPasswordVisible = false;
+
+  // Fungsi Pembantu untuk Dekorasi Input Field (Diperbarui untuk mendukung ikon mata)
+  InputDecoration _inputDecoration(
+    String hint,
+    IconData icon, {
+    bool isPassword = false,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: Colors.grey[400]),
+      prefixIcon: Icon(icon, color: Colors.grey),
+
+      // 👁️ Tambahkan Suffix Icon HANYA untuk Password Field
+      suffixIcon: isPassword
+          ? IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey,
+              ),
+              onPressed: () {
+                // Perbarui state saat ikon mata ditekan
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible; // Balik status
+                });
+              },
+            )
+          : null, // Jangan tampilkan ikon jika bukan field password
+
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: const BorderSide(color: Color(0xFF2196F3), width: 2.0),
+      ),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 16.0,
+        horizontal: 10.0,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +79,7 @@ class LoginScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const Text(
-              'Selamat Datang Kembali',
+              'Selamat Datang Kembali 👋',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -34,25 +92,36 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
+            // Field Email
             const Text('Email', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextFormField(
+              controller: _emailController, // ⬅️ Dihubungkan ke Controller
               keyboardType: TextInputType.emailAddress,
-              decoration: _inputDecoration('contoh@email.com', Icons.email),
+              decoration: _inputDecoration('Masukkan email', Icons.email),
             ),
             const SizedBox(height: 24),
 
+            // Field Kata Sandi
             const Text(
               'Kata Sandi',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             TextFormField(
-              obscureText: true,
-              decoration: _inputDecoration('••••••••', Icons.lock),
+              controller: _passwordController, // ⬅️ Dihubungkan ke Controller
+              // Kontrol apakah teks disembunyikan menggunakan state _isPasswordVisible
+              obscureText: !_isPasswordVisible,
+              // Panggil dekorasi dengan isPassword: true untuk menampilkan ikon mata
+              decoration: _inputDecoration(
+                'Masukkan Kata Sandi',
+                Icons.lock,
+                isPassword: true,
+              ),
             ),
             const SizedBox(height: 16),
 
+            // Lupa Kata Sandi
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
@@ -67,6 +136,7 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
+            // Tombol Login
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -82,13 +152,16 @@ class LoginScreen extends StatelessWidget {
 
                   if (success) {
                     // Berhasil Login: Ganti layar ke Home
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            HomeScreen(userId: auth.currentUserId!),
-                      ),
-                    );
+                    // Pastikan currentUserId tidak null sebelum digunakan
+                    if (auth.currentUserId != null) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              HomeScreen(userId: auth.currentUserId!),
+                        ),
+                      );
+                    }
                   } else {
                     // Gagal Login: Tampilkan pesan error
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -117,6 +190,7 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
+            // Link ke Register
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -124,7 +198,12 @@ class LoginScreen extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     // Navigasi ke Halaman Register
-                    // Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterScreen(),
+                      ),
+                    );
                   },
                   child: const Text(
                     'Daftar Sekarang',
@@ -138,32 +217,6 @@ class LoginScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String hint, IconData icon) {
-    return InputDecoration(
-      hintText: hint,
-      prefixIcon: Icon(icon, color: Colors.grey),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: const BorderSide(
-          color: Color(0xFFE0E0E0),
-        ), // Border abu-abu muda
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: const BorderSide(
-          color: Color(0xFF2196F3),
-          width: 2.0,
-        ), // Fokus Biru
-      ),
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 16.0,
-        horizontal: 10.0,
       ),
     );
   }
