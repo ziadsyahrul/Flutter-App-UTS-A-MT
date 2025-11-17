@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         return MaterialApp(
-          title: 'MentalCheck',
+          title: 'MentalHealthCheck',
           debugShowCheckedModeBanner: false,
 
           // LOCALIZATION SETUP
