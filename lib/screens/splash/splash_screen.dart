@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_for_ues/providers/auth_provider.dart';
 import 'package:flutter_app_for_ues/screens/auth/login_screen.dart';
 import 'package:provider/provider.dart';
-import '../home/home_screen.dart'; // pastikan ini mengarah ke file HomeScreen kamu
+import '../home/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
         // Jika belum login, navigasi ke LoginScreen
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       }
     });
@@ -64,10 +64,10 @@ class _SplashScreenState extends State<SplashScreen>
         backgroundColor: Colors.blue,
         body: FadeTransition(
           opacity: _fadeAnimation,
-          child: Center(
+          child: const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.psychology, size: 100, color: Colors.white),
                 SizedBox(height: 20),
                 Text(
