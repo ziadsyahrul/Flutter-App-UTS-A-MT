@@ -97,11 +97,11 @@ class InferenceEngine {
     double finalCF = diagnosisCFs[finalDiagnosisId]!;
 
     // 9. Ambil detail diagnosis
-    final diagnosisData = await db.query(
-      'diagnosissssss',
-      where: 'id = ?',
-      whereArgs: [finalDiagnosisId],
-    );
+    // final diagnosisData = await db.query(
+    //   'diagnosissssss',
+    //   where: 'id = ?',
+    //   whereArgs: [finalDiagnosisId],
+    // );
 
     // 10. Atau tentukan berdasarkan range CF
     final allDiagnosis = await db.query('diagnosis', orderBy: 'cf_min ASC');
