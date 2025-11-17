@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_for_ues/providers/auth_provider.dart';
+import 'package:flutter_app_for_ues/screens/home/home_screen.dart';
+import 'package:provider/provider.dart';
+
+final TextEditingController _nameController = TextEditingController();
+final TextEditingController _emailController = TextEditingController();
+final TextEditingController _passwordController = TextEditingController();
+final TextEditingController _confirmPasswordController =
+    TextEditingController();
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -87,8 +96,43 @@ class RegisterScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Aksi Register
+                onPressed: () async {
+                  if (_passwordController.text !=
+                      _confirmPasswordController.text) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Konfirmasi kata sandi tidak cocok!'),
+                      ),
+                    );
+                    return;
+                  }
+                  final auth = Provider.of<AuthProvider>(
+                    context,
+                    listen: false,
+                  );
+                  bool success = await auth.register(
+                    _nameController.text,
+                    _emailController.text,
+                    _passwordController.text,
+                  );
+
+                  if (success) {
+                    // Berhasil Register dan langsung Login: Ganti layar ke Home
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            HomeScreen(userId: auth.currentUserId!),
+                      ),
+                    );
+                  } else {
+                    // Gagal Register (misalnya email sudah terdaftar): Tampilkan pesan error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Pendaftaran gagal. Coba email lain.'),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2196F3), // Biru Primer

@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_for_ues/providers/auth_provider.dart';
+import 'package:flutter_app_for_ues/screens/home/home_screen.dart';
+import 'package:provider/provider.dart';
+
+final TextEditingController _emailController = TextEditingController();
+final TextEditingController _passwordController = TextEditingController();
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -64,8 +70,33 @@ class LoginScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Aksi Login
+                onPressed: () async {
+                  final auth = Provider.of<AuthProvider>(
+                    context,
+                    listen: false,
+                  );
+                  bool success = await auth.login(
+                    _emailController.text,
+                    _passwordController.text,
+                  );
+
+                  if (success) {
+                    // Berhasil Login: Ganti layar ke Home
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            HomeScreen(userId: auth.currentUserId!),
+                      ),
+                    );
+                  } else {
+                    // Gagal Login: Tampilkan pesan error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Email atau kata sandi salah!'),
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2196F3), // Biru Primer

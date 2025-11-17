@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_for_ues/providers/auth_provider.dart';
+import 'package:flutter_app_for_ues/screens/auth/login_screen.dart';
+import 'package:provider/provider.dart';
 import '../home/home_screen.dart'; // pastikan ini mengarah ke file HomeScreen kamu
 
 class SplashScreen extends StatefulWidget {
@@ -27,10 +30,23 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen(userId: 1)),
-      );
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      if (authProvider.isLoggedIn) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                HomeScreen(userId: authProvider.currentUserId!),
+          ),
+        );
+      } else {
+        // Jika belum login, navigasi ke LoginScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      }
     });
   }
 

@@ -352,5 +352,59 @@ class DatabaseHelper {
     // Tambahkan rules lain sesuai kebutuhan...
   }
 
+  Future<int> insertUser(String name, String email, String password) async {
+    final db = await database;
+
+    // Periksa apakah email sudah terdaftar
+    final existingUser = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+
+    if (existingUser.isNotEmpty) {
+      // Mengembalikan -1 jika email sudah ada (atau throw error, tergantung preferensi)
+      return -1;
+    }
+
+    final data = {
+      'name': name,
+      'email': email,
+      // Penting: Dalam aplikasi nyata, password harus selalu di-hash (misalnya dengan bcrypt)
+      // Sebelum disimpan. Untuk contoh sqflite sederhana ini, kita simpan plain text.
+      'password': password,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    // Mengembalikan ID pengguna baru yang berhasil dimasukkan
+    return await db.insert(
+      'users',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<Map<String, dynamic>?> getUser(String email, String password) async {
+    final db = await database;
+
+    // Mencari pengguna yang cocok dengan email DAN password
+    // Catatan: Jika password di-hash, kita perlu mengambil pengguna berdasarkan email
+    // terlebih dahulu, lalu membandingkan hash password di dalam kode Dart.
+    final List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      where: 'email = ? AND password = ?',
+      whereArgs: [email, password],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      // Jika ditemukan, kembalikan data pengguna pertama
+      return maps.first;
+    }
+
+    // Jika tidak ditemukan, kembalikan null
+    return null;
+  }
+
   // CRUD Methods akan ditambahkan nanti
 }
